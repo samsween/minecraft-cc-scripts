@@ -29,8 +29,6 @@ function Farm:getSeedAmount(seed)
     return item["amount"]
 end
 
-
-
 function Farm:printSeeds()
     for name, seed in pairs(self.allowedSeeds) do
         local s = self.refinedPeripheral.getItem({ name = seed })
@@ -52,7 +50,7 @@ function Farm:isSeedAvailable(seed)
 end
 
 function Farm:exportSeeds(seeds)
-    local farmArea = 80  -- Total farm area
+    local farmArea = 80 -- Total farm area
     local maxSeeds = #seeds
     local numPerSeed = math.floor(farmArea / maxSeeds)
     local valid = true
@@ -71,7 +69,6 @@ function Farm:exportSeeds(seeds)
         print("One or more seeds are not available. Export aborted.")
     end
 end
-
 
 function Farm:start(args)
     local validArgs = {}
@@ -98,6 +95,5 @@ function Farm:start(args)
         self:exportSeeds(seeds)
     end
 end
-
 
 return Farm
