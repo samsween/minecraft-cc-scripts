@@ -30,7 +30,7 @@ end
 function SeedManager:writeFile(fileContent)
     local file = io.open(self.filename, "w")
     for _, line in ipairs(fileContent) do
-        file:write(line)
+        file:write(line .. "\n")
     end
     file:close()
 end
@@ -48,12 +48,12 @@ function SeedManager:doesExist(name, seed)
     for i = 2, #fileContent - 1 do
         local nameE, seedE = fileContent[i]:match('allowedSeeds%["(.*)"%]%s*=%s*"(.*)"')
         if nameE == name then
-            print("Seed name already exists")
+            print("Seed name " .. name .. " already exists")
             exists = true
             break
         end
         if seedE == seed then
-            print("Seed already exists")
+            print("Seed " .. seed .. " already exists")
             exists = true
             break
         end
