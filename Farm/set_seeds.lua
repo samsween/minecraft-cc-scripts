@@ -112,7 +112,16 @@ function SeedManager:setSeedsFromChest()
     self:writeSeeds(seeds)
 end
 
-function SeedManager:setSeedsFromFile(fileName)
+function SeedManager:setSeedsFromFile(args)
+    local fileName = args[3]
+    if fileName == nil then
+        print("File name not provided")
+        return
+    end
+    if fs.exists(fileName) == false then
+        print("File does not exist")
+        return
+    end
     local file = io.open(fileName, "r")
     local seeds = {}
     for line in file:lines() do
@@ -129,6 +138,10 @@ end
 function SeedManager:setSeedsFromCommand(args)
     local seeds = {}
     for i = 3, #args, 2 do
+        if args[i + 1] == nil then
+            print("Seed not provided for "..args[i])
+            return
+        end
         seeds[args[i]] = args[i + 1]
     end
     self:writeSeeds(seeds)
