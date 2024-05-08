@@ -1,6 +1,3 @@
-
-
-
 SeedManager = {}
 SeedManager.__index = SeedManager
 
@@ -18,10 +15,7 @@ function SeedManager:isValid(name, seed)
         return false
     end
     return true
-    
 end
-
-
 
 function SeedManager:getFileLines()
     local file = io.open(self.filename, "r")
@@ -39,7 +33,6 @@ function SeedManager:writeFile(fileContent)
         file:write(line)
     end
     file:close()
-    
 end
 
 function SeedManager:printSeeds()
@@ -75,7 +68,6 @@ function SeedManager:checkSeedTable(seedTable)
         end
     end
     return true
-    
 end
 
 function SeedManager:writeSeeds(seeds)
@@ -85,13 +77,12 @@ function SeedManager:writeSeeds(seeds)
     local fileContent = self:getFileLines()
     local exportLine = fileContent[#fileContent]
     fileContent[#fileContent] = nil
-    for name, seed in pairs(seeds) do 
-        table.insert(fileContent, "allowedSeeds[\""..name.."\"]=\""..seed.."\"\n")
+    for name, seed in pairs(seeds) do
+        table.insert(fileContent, "allowedSeeds[\"" .. name .. "\"]=\"" .. seed .. "\"\n")
     end
     fileContent[#fileContent] = exportLine
     self:writeFile(fileContent)
 end
-
 
 function SeedManager:setSeedsFromChest()
     if self.chest == nil then
@@ -101,7 +92,7 @@ function SeedManager:setSeedsFromChest()
     local seeds = {}
     local itemsInChest = self.chest.list()
     for _, item in ipairs(itemsInChest) do
-        print("Enter seed name for "..item.name .. ": ")
+        print("Enter seed name for " .. item.name .. ": ")
         local localSeedName = read()
         if localSeedName == "" then
             goto continue
@@ -132,14 +123,13 @@ function SeedManager:setSeedsFromFile(args)
     end
     self:writeSeeds(seeds)
     file:close()
-
 end
 
 function SeedManager:setSeedsFromCommand(args)
     local seeds = {}
     for i = 3, #args, 2 do
         if args[i + 1] == nil then
-            print("Seed not provided for "..args[i])
+            print("Seed not provided for " .. args[i])
             return
         end
         seeds[args[i]] = args[i + 1]
