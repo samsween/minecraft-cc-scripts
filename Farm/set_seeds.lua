@@ -8,6 +8,7 @@ setmetatable(SeedManager, {
     __call = function(cls, filename)
         local instance = setmetatable({}, cls)
         instance.filename = filename
+        instance.chest = peripheral.find("inventory")
         return instance
     end
 })
@@ -39,17 +40,40 @@ function SeedManager:writeFile(fileContent)
     
 end
 
-function SeedManager:writeSeeds(name, seed)
-    if not self:isValid(name, seed) then
-        print("Invalid seed")
-        return
+function SeedManager:printSeeds()
+    local fileContent = self:getFileLines()
+    for _, line in ipairs(fileContent) do
+        print(line)
     end
-    local file = io.open(fileName)
-    if file == nil then
-        print("File not found")
-        return
+end
+
+function SeedManager:writeSeeds(seeds)
+    local fileContent = self:getFileLines()
+    local exportLine = fileContent[#fileContent]
+    fileContent[#fileContent] = nil
+    for name, seed in pairs(seeds) do 
+        table.insert(fileContent, "allowedSeeds[\""..name.."\"]=\""..seed.."\"\n")
     end
-    local fileContent = self:GetFileLines()
-    fileContent[#fileContent-1] = "allowedSeeds[\""..name.."\"]=\""..seed.."\"\n"
+    fileContent[#fileContent] = exportLine
     self:writeFile(fileContent)
 end
+
+function SeedManager:setSeedsFromChest()
+    if self.chest == nil then
+        print("Chest not found")
+        return
+    end
+    local seeds = {}
+    local itemsInChest = self.chest.list()
+    for _, item in ipairs(itemsInChest) do
+        print("Enter seed name for "..item.name .. ": ")
+        local localSeedName = read()
+        if localSeedName == "" then
+            goto continue
+        end
+        seeds[localSeedName] = item.name
+        ::continue::
+    end
+    self:writeSeeds(seeds)
+end
+
