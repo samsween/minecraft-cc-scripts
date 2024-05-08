@@ -73,37 +73,49 @@ end
 
 function Farm:SetSeeds(args)
     local validArgs = {}
-    validArgs["chest"] = self.seedManager:setSeedsFromChest()
-    validArgs["command"] = self.seedManager:setSeedsFromCommand(args)
-    validArgs["file"] = self.seedManager:setSeedsFromFile(args)
+    validArgs["chest"] = true
+    validArgs["command"] = true
+    validArgs["file"] = true
     local givenArg = args[1]
     if not validArgs[givenArg] then
         print("Invalid argument. Please provide a valid argument")
         print("Valid arguments are: chest, command, file")
         return
     end
-    validArgs[givenArg]()
+    if givenArg == "chest" then
+        self.seedManager:setSeedsFromChest()
+    elseif givenArg == "command" then
+        self.seedManager:setSeedsFromCommand(args)
+    elseif givenArg == "file" then
+        self.seedManager:setSeedsFromFile(args)
+    end
 end
 
 function Farm:start(args)
     local validArgs = {}
-    validArgs["clear"] = self:clearFarm()
-    validArgs["plant"] = self:plantFarm()
-    validArgs["print"] = self:printSeeds()
+    validArgs["clear"] = true
+    validArgs["plant"] = true
+    validArgs["print"] = true
     validArgs["export"] = true
     local givenArg = args[1]
     if not validArgs[givenArg] then
         print("Invalid argument. Please provide a valid argument.")
         return
     end
-    if givenArg == "export" then
+    if givenArg == "clear" then
+        self:clearFarm()
+    elseif givenArg == "plant" then
+        self:plantFarm()
+    elseif givenArg == "print" then
+        self:printSeeds()
+    elseif givenArg == "export" then
         local seeds = {}
         for i = 2, #args do
             table.insert(seeds, args[i])
         end
         self:exportSeeds(seeds)
-    else
-        validArgs[givenArg]()
+    elseif givenArg == "set" then
+        self:SetSeeds(args)
     end
 end
 
