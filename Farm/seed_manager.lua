@@ -80,7 +80,7 @@ function SeedManager:writeSeeds(seeds)
     for name, seed in pairs(seeds) do
         table.insert(fileContent, "allowedSeeds[\"" .. name .. "\"]=\"" .. seed .. "\"\n")
     end
-    fileContent[#fileContent] = exportLine
+    fileContent[#fileContent + 1] = exportLine
     self:writeFile(fileContent)
 end
 
