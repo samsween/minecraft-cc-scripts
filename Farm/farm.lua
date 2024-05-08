@@ -8,7 +8,7 @@ setmetatable(Farm, {
         local instance = setmetatable({}, cls)
         instance.refinedPeripheral = peripheral.find("rsBridge")
         instance.allowedSeeds = allowedSeeds
-        instance.seedManager = SeedManager("Farm/allowed_seeds.lua")
+        instance.seedManager = SeedManager("allowed_seeds.lua")
         return instance
     end
 })
@@ -31,18 +31,24 @@ function Farm:getSeedAmount(seed)
 end
 
 function Farm:printSeeds()
-    for name, seed in pairs(self.allowedSeeds) do
+    local seeds = self.allowedSeeds
+    local seedInOrder = {}
+    for name, seed in pairs(seeds) do
         local s = self.refinedPeripheral.getItem({ name = seed })
-        if (s == nil) then
-            print("Seed not found: " .. name)
-            return
+        if s ~= nil then
+            table.insert(seedInOrder, { name = name, amount = s["amount"] })
         end
-        print(name .. " : " .. s["amount"])
+    end
+    table.sort(seedInOrder, function (a, b)
+        return a["amount"] > b["amount"]
+    end)
+    for _, seed in ipairs(seedInOrder) do
+        print(seed["name"] .. ": " .. seed["amount"])
     end
 end
 
 function Farm:isSeedAvailable(seed)
-    local amount = self.getSeedAmount(seed)
+    local amount = self:getSeedAmount(seed)
     if amount <= 0 then
         print(seed .. " is not available")
         return false
@@ -76,7 +82,7 @@ function Farm:SetSeeds(args)
     validArgs["chest"] = true
     validArgs["command"] = true
     validArgs["file"] = true
-    local givenArg = args[1]
+    local givenArg = args[2]
     if not validArgs[givenArg] then
         print("Invalid argument. Please provide a valid argument")
         print("Valid arguments are: chest, command, file")
@@ -97,6 +103,7 @@ function Farm:start(args)
     validArgs["plant"] = true
     validArgs["print"] = true
     validArgs["export"] = true
+    validArgs["set"] = true
     local givenArg = args[1]
     if not validArgs[givenArg] then
         print("Invalid argument. Please provide a valid argument.")
@@ -111,7 +118,11 @@ function Farm:start(args)
     elseif givenArg == "export" then
         local seeds = {}
         for i = 2, #args do
-            table.insert(seeds, args[i])
+            if not self.allowedSeeds[args[i]] then
+                print("Invalid seed: " .. args[i])
+                return
+            end
+          table.insert(seeds, self.allowedSeeds[args[i]])
         end
         self:exportSeeds(seeds)
     elseif givenArg == "set" then
