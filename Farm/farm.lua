@@ -1,5 +1,5 @@
 local allowedSeeds = require("allowed_seeds")
-
+local SeedManager = require("seed_manager")
 Farm = {}
 Farm.__index = Farm
 
@@ -8,6 +8,7 @@ setmetatable(Farm, {
         local instance = setmetatable({}, cls)
         instance.refinedPeripheral = peripheral.find("rsBridge")
         instance.allowedSeeds = allowedSeeds
+        instance.seedManager = SeedManager("Farm/allowed_seeds.lua")
         return instance
     end
 })
@@ -67,6 +68,22 @@ function Farm:exportSeeds(seeds)
         end
     else
         print("One or more seeds are not available. Export aborted.")
+    end
+end
+
+function Farm:SetSeeds(args)
+    local validArgs = {}
+    validArgs["chest"] = true
+    validArgs["command"] = true
+    local givenArg = args[1]
+    if not validArgs[givenArg] then
+        print("Invalid argument. Please provide a valid argument.")
+        return
+    end
+    if givenArg == "chest" then
+        self.seedManager:setSeedsFromChest()
+    elseif givenArg == "command" then
+        self.seedManager:setSeedsFromCommand(args)
     end
 end
 
