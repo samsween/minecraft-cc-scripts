@@ -21,6 +21,8 @@ function SeedManager:isValid(name, seed)
     
 end
 
+
+
 function SeedManager:getFileLines()
     local file = io.open(self.filename, "r")
     local fileContent = {}
@@ -47,7 +49,39 @@ function SeedManager:printSeeds()
     end
 end
 
+function SeedManager:doesExist(name, seed)
+    local fileContent = self:getFileLines()
+    local exists = false
+    for i = 2, #fileContent - 1 do
+        local nameE, seedE = fileContent[i]:match('allowedSeeds%["(.*)"%]%s*=%s*"(.*)"')
+        if nameE == name then
+            print("Seed name already exists")
+            exists = true
+            break
+        end
+        if seedE == seed then
+            print("Seed already exists")
+            exists = true
+            break
+        end
+    end
+    return exists
+end
+
+function SeedManager:checkSeedTable(seedTable)
+    for name, seed in pairs(seedTable) do
+        if self:doesExist(name, seed) then
+            return false
+        end
+    end
+    return true
+    
+end
+
 function SeedManager:writeSeeds(seeds)
+    if not self:checkSeedTable(seeds) then
+        return
+    end
     local fileContent = self:getFileLines()
     local exportLine = fileContent[#fileContent]
     fileContent[#fileContent] = nil
@@ -57,6 +91,7 @@ function SeedManager:writeSeeds(seeds)
     fileContent[#fileContent] = exportLine
     self:writeFile(fileContent)
 end
+
 
 function SeedManager:setSeedsFromChest()
     if self.chest == nil then
@@ -77,3 +112,26 @@ function SeedManager:setSeedsFromChest()
     self:writeSeeds(seeds)
 end
 
+function SeedManager:setSeedsFromFile(fileName)
+    local file = io.open(fileName, "r")
+    local seeds = {}
+    for line in file:lines() do
+        local name, seed = line:match("(.*)=(.*)")
+        if self:isValid(name, seed) then
+            seeds[name] = seed
+        end
+    end
+    self:writeSeeds(seeds)
+    file:close()
+
+end
+
+function SeedManager:setSeedsFromCommand(args)
+    local seeds = {}
+    for i = 3, #args, 2 do
+        seeds[args[i]] = args[i + 1]
+    end
+    self:writeSeeds(seeds)
+end
+
+return SeedManager
